@@ -36,11 +36,13 @@ This project uses [webpack](https://webpack.js.org/) to compile the JavaScript a
 $ yarn install
 ```
 
+*Note: This project is written in [Elm](http://elm-lang.org/) and uses Elm libraries. The Elm libraries are listed in `elm-package.json`. The `elm-webpack-builder` in `package.json` installs Elm in `node_modules/`, and installs Elm libraries in `elm-stuff/`, automatically when the above command is run.*
+
 ## Run locally for development
 
 The project uses webpack's ability to run a development web server to serve up HTML, JS and other static assets while developing.  Webpack configuration is in the file `webpack.config.js`.
 
-To make it easy to execute webpack, a couple of yarn commands are defined in `package.json`, in the `scripts' entry.
+To make it easy to execute webpack, a couple of yarn commands are defined in `package.json`, in the `scripts` entry.
 
 To start a development web server, run:
 
@@ -50,11 +52,9 @@ $ yarn runclient
 
 This call webpack to start a development server on port 3000. You will be now be able to see the project in your browser at [http://localhost:3000/].  The content should be like this:
 
->    Hi there and greetings!
->
->    # Hello, World!
+>    
+>    # Hello, Stranger
 
-The text "Hi there and greetings!" is inserted by JavaScript dynamically.  If it does not appear, the asset bundling feature of webpack is not working, and you should check `webpack.config.js` and `package.json`.
 
 *Note: serving up the files in `src/` with a simple web server (e.g., via `python -m http.server`) is not sufficient as the HTML refers to javascript that must be first created.  You must use webpack to assemble the assets, and `yarn build` and `yarn runclient` do that.*
 
