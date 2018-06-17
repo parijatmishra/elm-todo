@@ -79,7 +79,7 @@ view model =
         [ Html.h1 [] [ Html.h1 [] [ Html.text "Todos" ] ]
         , Html.ul [] (List.map viewTodo model.todos)
         , Html.h2 [] [ Html.text "Add new" ]
-        , Html.textarea [ Attr.cols 80, Attr.rows 5 ] []
+        , Html.input [] []
         , Html.button [] [ Html.text "Add" ]
         ]
 
