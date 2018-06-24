@@ -124,7 +124,7 @@ viewTodoItem todo =
                 ]
         , div   [ class "col ml2" ]
                 [ button    [ onClick (DeleteTodo todo.id) ]
-                            [ text "Delete" ]
+                            [ i [ class "fa fa-trash" ] []]
                 ]
         ]
 
