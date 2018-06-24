@@ -2,7 +2,7 @@ module Main exposing (..)
 
 import Html exposing (Html, div, span, input, text, button, i)
 import Html.Events exposing (onClick, onInput)
-import Html.Attributes exposing (class, classList, placeholder, type_, checked, disabled, value)
+import Html.Attributes exposing (class, classList, placeholder, type_, checked, disabled, value, title, style)
 
 main : Program Never Model Msg
 main =
@@ -74,7 +74,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         ChangeText newText ->
-            ( {model | newTodoText = String.trim newText}, Cmd.none )
+            ( {model | newTodoText = newText}, Cmd.none )
         AddTodo ->
             let newTodo = { id = model.nextId, title = model.newTodoText, complete = False }
                 todos = newTodo :: model.todos
@@ -103,27 +103,27 @@ view : Model -> Html Msg
 view model =
     Html.div []
         [ Html.h1 [] [ Html.h1 [] [ Html.text "Todos" ] ]
-        , viewNewTodoForm model
+        , newTodoForm model.newTodoText
         , viewTodoList model
         ]
 
 viewTodoList : Model -> Html Msg
 viewTodoList model =
-    div [ class "p1" ] (List.map viewTodoItem model.todos)
+    div [] (List.map viewTodoItem model.todos)
 
 viewTodoItem : Todo -> Html Msg
 viewTodoItem todo =
-    div [ class "clearfix p1"]
+    div [ class "clearfix max-width-3 m1 p1 border rounded"]
         [ div   [ class "col col-10" ]
                 [ span  [ class <| todoItemBassClass todo ]
                         [ text todo.title ]
                 ]
-        , div   [ class "col ml2" ]
+        , div   [ class "col col-1 center" ]
                 [ input [ type_ "checkbox", checked todo.complete, onClick (ToggleTodo todo.id) ]
                         []
                 ]
-        , div   [ class "col ml2" ]
-                [ button    [ onClick (DeleteTodo todo.id) ]
+        , div   [ class "col col-1 center" ]
+                [ button    [ onClick (DeleteTodo todo.id), title "Delete" ]
                             [ i [ class "fa fa-trash" ] []]
                 ]
         ]
@@ -134,18 +134,25 @@ todoItemBassClass todo =
     then "underline italic"
     else "bold"
 
-viewNewTodoForm : Model -> Html Msg
-viewNewTodoForm model =
-        div [ class "p1" ]
-            [ div   []
-                    [ input [ placeholder "Add new todo", onInput ChangeText, value model.newTodoText ]
-                            []
-                    ]
-            , div   []
-                    [ button    [ onClick AddTodo, disabled (String.isEmpty model.newTodoText) ]
-                                [ text "Add" ]
-                    ]
-            ]
+newTodoForm : String -> Html Msg
+newTodoForm todoText =
+    div [ class "clearfix max-width-3 m1 p1 border rounded"]
+        [ div   [ class "col col-10" ]
+                [ input [ type_ "text"
+                        , placeholder "Add new todo"
+                        , class "block col-12 mb1 field"
+                        , onInput ChangeText
+                        , value todoText
+                        ]
+                        []
+                ]
+        , div   [ class "col col-2 center"]
+                [ button    [ onClick AddTodo, class "btn bold white bg-green" ]
+                            [ i [ class "fa fa-save mr1" ] []
+                            , text "Save"
+                            ]
+                ]
+        ]
 
 --- SUBSCRIPTIONS
 
