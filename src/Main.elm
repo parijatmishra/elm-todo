@@ -149,7 +149,7 @@ newTodoForm todoText =
         , div   [ class "col col-2 center"]
                 [ button    [ onClick AddTodo, class "btn bold white bg-green" ]
                             [ i [ class "fa fa-save mr1" ] []
-                            , text "Save"
+                            , text "Add"
                             ]
                 ]
         ]
