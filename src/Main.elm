@@ -131,7 +131,7 @@ viewTodoItem todo =
 todoItemBassClass : Todo -> String
 todoItemBassClass todo =
     if todo.complete
-    then "underline italic"
+    then "gray"
     else "bold"
 
 newTodoForm : String -> Html Msg
