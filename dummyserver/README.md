@@ -20,12 +20,12 @@ yarn install
 yarn server
 ```
 
-Now you can make API calls against it.
+Now you can make API calls against it at `http://localhost:4000/api`
 
 ### Listing all todos
 
 ```
-$ curl http://localhost:4000/todos
+$ curl http://localhost:4000/api/todos
 [
   {
     "id": "1",
@@ -48,7 +48,7 @@ $ curl http://localhost:4000/todos
 ### Listing a single TODO
 
 ```
-$ curl http://localhost:4000/todos/1
+$ curl http://localhost:4000/api/todos/1
 {
   "id": "1",
   "title": "First todo",
@@ -59,7 +59,7 @@ $ curl http://localhost:4000/todos/1
 ### Adding a TODO, specifying a unique ID
 
 ```
-$ curl -X POST --header 'Content-type: application/json' --data-binary '{"id": 4, "title":"Another todo", "complete":true}' http://localhost:4000/todos/
+$ curl -X POST --header 'Content-type: application/json' --data-binary '{"id": 4, "title":"Another todo", "complete":true}' http://localhost:4000/api/todos/
 {
   "id": 4,
   "title": "Another todo",
@@ -75,7 +75,7 @@ If the `id` is already taken, the server will return an error and not save the t
 It is perhaps best to not specify the `id` field and let the server generate one.
 
 ```
-$ curl -X POST --header 'Content-type: application/json' --data-binary '{"title":"Yet another todo", "complete":true}' http://localhost:4000/todos/
+$ curl -X POST --header 'Content-type: application/json' --data-binary '{"title":"Yet another todo", "complete":true}' http://localhost:4000/api/todos/
 {
   "title": "Yet another todo",
   "complete": true,
@@ -91,7 +91,7 @@ Here, the server generated the value `5` for the field `id`.
 If you know the `id` of a todo, you can delete it:
 
 ```
-$ curl -X DELETE http://localhost:4000/todos/4
+$ curl -X DELETE http://localhost:4000/api/todos/4
 {}
 $  curl http://localhost:4000/todos
 [
@@ -125,7 +125,7 @@ Now the todo `4` is no longer present in the output.
 You can change any field of a todo (except its `id`):
 
 ```
-$ curl -X PUT -H "Content-type: application/json" --data-binary '{"title": "Changing a todo", "complete": false}' http://localhost:4000/todos/5
+$ curl -X PUT -H "Content-type: application/json" --data-binary '{"title": "Changing a todo", "complete": false}' http://localhost:4000/api/todos/5
 {
   "title": "Changing a todo",
   "complete": false,
