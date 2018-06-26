@@ -1,24 +1,19 @@
 {
   "todos": [
     {
-      "id": "1",
+      "id": 1,
       "title": "First todo",
       "complete": false
     },
     {
-      "id": "2",
-      "title": "First todo",
+      "id": 2,
+      "title": "Second todo",
       "complete": true
     },
     {
-      "id": "3",
+      "id": 3,
       "title": "Third todo",
       "complete": false
-    },
-    {
-      "title": "Changing a todo",
-      "complete": false,
-      "id": 5
     }
   ]
 }
