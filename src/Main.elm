@@ -3,6 +3,10 @@ module Main exposing (..)
 import Html exposing (Html, div, span, input, text, button, i)
 import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (class, classList, placeholder, type_, checked, disabled, value, title, style)
+import Http
+import RemoteData exposing (WebData)
+import Json.Decode as Decode
+import Json.Decode.Pipeline as Pipeline
 
 main : Program Never Model Msg
 main =
@@ -19,9 +23,8 @@ main =
 
 
 type alias Model =
-    { todos : List Todo
+    { todos : (WebData (List Todo))
     , newTodoText: String
-    , nextId: Int
     }
 
 
@@ -32,41 +35,46 @@ type alias Todo =
     }
 
 
-init : ( Model, Cmd Msg )
-init =
-    ( initModel, Cmd.none )
-
-
-initModel : Model
-initModel =
-    { todos =
-        [ { id = 1
-          , title = "Add checkbox"
-          , complete = True
-          }
-        , { id = 2
-          , title = "Add form"
-          , complete = True
-          }
-        , { id = 3
-          , title = "Handle Submit"
-          , complete = False
-          }
-        ]
-    , newTodoText = ""
-    , nextId = 4
-    }
-
-
-
 --- MESSAGES
 
 
 type Msg =
-    ChangeText String
+    OnTodosFetched (WebData (List Todo))
+    | ChangeText String
     | AddTodo
     | ToggleTodo Int
     | DeleteTodo Int
+
+
+--- COMMAND helpers
+baseUrl: String
+baseUrl = "http://localhost:4000/api"
+fetchTodosUrl: String
+fetchTodosUrl = baseUrl ++ "/todos"
+
+
+todosDecoder : Decode.Decoder (List Todo)
+todosDecoder = Decode.list todoDecoder
+
+todoDecoder : Decode.Decoder Todo
+todoDecoder = Pipeline.decode Todo
+        |> Pipeline.required "id" Decode.int
+        |> Pipeline.required "title" Decode.string
+        |> Pipeline.required "complete" Decode.bool
+
+fetchTodos : Cmd Msg
+fetchTodos =
+    Http.get fetchTodosUrl todosDecoder
+    |> RemoteData.sendRequest
+    |> Cmd.map OnTodosFetched
+
+
+--- INIT
+
+init : ( Model, Cmd Msg )
+init =
+    ( {todos = RemoteData.Loading, newTodoText = ""}, fetchTodos )
+
 
 --- UPDATE
 
@@ -76,40 +84,59 @@ update msg model =
         ChangeText newText ->
             ( {model | newTodoText = newText}, Cmd.none )
         AddTodo ->
-            let newTodo = { id = model.nextId, title = model.newTodoText, complete = False }
-                todos = newTodo :: model.todos
-                nextId = model.nextId + 1
+            let
+                newTodo = { title = model.newTodoText, complete = False }
             in
-                ( { model | todos = todos, newTodoText = "", nextId = nextId }, Cmd.none )
+                ( { model | newTodoText = "" }, Cmd.none )
         ToggleTodo id ->
             let
                 f todo =
                     if id == todo.id
                     then { todo | complete = not todo.complete }
                     else todo
-                todos = List.map f model.todos
+                todos = model.todos
+                    |> RemoteData.map (List.map f)
             in
                 ({ model | todos = todos }, Cmd.none )
         DeleteTodo id ->
             let
-                todos = List.filter (\t -> t.id /= id) model.todos
+                todos =  model.todos
+                    |> RemoteData.map (List.filter (\t -> t.id /= id))
             in
                 ({ model | todos = todos }, Cmd.none )
+        OnTodosFetched todos ->
+            ( {model | todos = todos }, Cmd.none)
 
 --- VIEW
 
 
 view : Model -> Html Msg
 view model =
-    Html.div []
-        [ Html.h1 [] [ Html.h1 [] [ Html.text "Todos" ] ]
-        , newTodoForm model.newTodoText
-        , viewTodoList model
-        ]
+    maybeTodos model
 
-viewTodoList : Model -> Html Msg
-viewTodoList model =
-    div [] (List.map viewTodoItem model.todos)
+maybeTodos : Model -> Html Msg
+maybeTodos model =
+    case model.todos of
+        RemoteData.NotAsked ->
+            text "Initialising..."
+        RemoteData.Loading ->
+            text "Loading..."
+        RemoteData.Failure err ->
+            text <| "Error loading todos: " ++ (toString err)
+        RemoteData.Success todos ->
+            todoPage model.newTodoText todos
+
+todoPage : String -> List Todo -> Html Msg
+todoPage newTodoText todos =
+        Html.div []
+            [ Html.h1 [] [ Html.h1 [] [ Html.text "Todos" ] ]
+            , newTodoForm newTodoText
+            , viewTodoList todos
+            ]
+
+viewTodoList : List Todo -> Html Msg
+viewTodoList todos =
+    div [] (List.map viewTodoItem todos)
 
 viewTodoItem : Todo -> Html Msg
 viewTodoItem todo =
